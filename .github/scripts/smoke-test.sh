@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 # Runs the release APK on an emulator before it's published. R8 removes code it thinks is unused,
 # and code that is only reached by reflection breaks only when the app runs. Opens the app, plays a
-# public test stream from a localtv:// link (Israeli channels may not be reachable from GitHub's
-# servers), visits every tab and Settings, goes to the home screen, and fails if the app crashes or
-# nothing plays. Crashes are shown with the original names, decoded with the build's mapping file.
-# Screenshots (smoke-*.png) are published with the build.
+# public test stream from a localtv:// link (always available, whatever is on air), visits every
+# tab and Settings, goes to the home screen, and fails if the app crashes or nothing plays. Crashes
+# are shown with the original names, decoded with the build's mapping file. Screenshots
+# (smoke-*.png) are published with the build.
 # Usage: smoke-test.sh <apk> <mapping.txt>
 set -u
 
@@ -14,6 +14,12 @@ pkg=io.github.eyalshimshi.localtv
 # https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8, URL-encoded for the link.
 test_stream="https%3A%2F%2Ftest-streams.mux.dev%2Fx36xhzz%2Fx36xhzz.m3u8"
 retrace="$ANDROID_HOME/cmdline-tools/latest/bin/retrace"
+
+# Every adb call gives up after a minute, so a frozen emulator fails the test instead of hanging it.
+adb_bin=$(command -v adb)
+adb() {
+  timeout 60 "$adb_bin" "$@"
+}
 
 # Fails the test; the details go to the log and to the run's Summary page.
 fail() {
@@ -93,7 +99,7 @@ must_tap() {
   fi
 }
 
-adb install -r -g "$apk" || fail "The APK didn't install"
+timeout 300 "$adb_bin" install -r -g "$apk" || fail "The APK didn't install"
 adb logcat -c || true
 
 echo "Opening Local TV"
@@ -142,6 +148,9 @@ adb shell input keyevent KEYCODE_HOME
 sleep 8
 check_no_crash "in the background"
 screenshot home
+
+# Stops the players so the emulator shuts down quickly.
+adb shell am force-stop "$pkg" || true
 
 echo "Smoke test passed: Local TV opened, played the test stream and showed every tab."
 echo "Smoke test passed: Local TV opened, played the test stream and showed every tab." >> "${GITHUB_STEP_SUMMARY:-/dev/null}"
