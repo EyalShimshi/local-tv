@@ -149,7 +149,12 @@ jobs:
           api-level: 34
           target: google_apis
           arch: x86_64
+          cores: 4
+          ram-size: 4096M
           disable-animations: true
+          # The emulator's host-side video decoder crashed the whole emulator once several channels
+          # played (build 2); the emulated phone decodes in software instead.
+          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -feature -HardwareDecoder
           script: bash .github/scripts/smoke-test.sh local-tv-${{ env.APK_LABEL }}.apk mapping-${{ env.APK_LABEL }}.txt
 
       - name: Upload the APK

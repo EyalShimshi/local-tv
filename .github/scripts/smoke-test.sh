@@ -11,8 +11,9 @@ set -u
 apk=$1
 mapping=$2
 pkg=io.github.eyalshimshi.localtv
-# https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8, URL-encoded for the link.
-test_stream="https%3A%2F%2Ftest-streams.mux.dev%2Fx36xhzz%2Fx36xhzz.m3u8"
+# A public test stream (its 512x288 rendition, light enough for an emulator), URL-encoded for the link:
+# https://test-streams.mux.dev/x36xhzz/url_4/193039199_mp4_h264_aac_7.m3u8
+test_stream="https%3A%2F%2Ftest-streams.mux.dev%2Fx36xhzz%2Furl_4%2F193039199_mp4_h264_aac_7.m3u8"
 retrace="$ANDROID_HOME/cmdline-tools/latest/bin/retrace"
 
 # Every adb call gives up after a minute, so a frozen emulator fails the test instead of hanging it.
