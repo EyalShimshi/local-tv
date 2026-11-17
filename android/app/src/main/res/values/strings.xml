@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Local TV</string>
+
+    <!-- Tabs -->
+    <string name="nav_watch">Watch</string>
+    <string name="nav_channels">Channels</string>
+    <string name="nav_news">News</string>
+
+    <!-- Watch -->
+    <string name="watch_checking">Checking which channels are on air…</string>
+    <string name="watch_none_title">No channels switched on</string>
+    <string name="watch_none_body">Switch on the channels you want to watch in Channels.</string>
+    <string name="action_choose_channels">Choose channels</string>
+    <string name="watch_off_air_title">Nothing on air right now</string>
+    <plurals name="watch_off_air_body">
+        <item quantity="one">Your channel is off air. It appears here by itself when it goes live.</item>
+        <item quantity="other">All %d of your channels are off air. They appear here by themselves when they go live.</item>
+    </plurals>
+    <string name="action_refresh">Refresh</string>
+    <string name="action_more">More options</string>
+    <string name="tile_size">Tile size</string>
+    <string name="tile_size_large">Large (one per row)</string>
+    <string name="tile_size_medium">Medium (two side by side)</string>
+    <string name="tile_size_small">Small (three side by side)</string>
+    <string name="show_meters">Level meters</string>
+    <string name="action_spotlight">Spotlight and solo</string>
+    <string name="audible">Playing sound</string>
+    <string name="status_reconnecting">Reconnecting…</string>
+    <string name="mute_letter">M</string>
+    <string name="solo_letter">S</string>
+    <string name="action_mute">Mute</string>
+    <string name="action_solo">Solo</string>
+    <string name="state_on">On</string>
+    <string name="state_off">Off</string>
+    <string name="action_fullscreen">Fullscreen</string>
+    <string name="action_close_preview">Close</string>
+    <string name="action_back_to_grid">Back to the grid</string>
+    <string name="action_exit_fullscreen">Exit fullscreen</string>
+    <string name="action_previous_channel">Previous channel</string>
+    <string name="action_next_channel">Next channel</string>
+    <string name="action_move_earlier">Move earlier</string>
+    <string name="action_move_later">Move later</string>
+
+    <!-- Sound -->
+    <string name="sound_title">Sound</string>
+    <string name="sound_volume">Volume</string>
+    <string name="percent_value">%1$d%%</string>
+    <string name="sound_boost_hint" formatted="false">Above 100% boosts quiet channels; a limiter keeps the sound clean.</string>
+    <string name="action_unmute_all">Unmute all</string>
+    <string name="action_mute_all">Mute all</string>
+    <string name="action_clear_solos">Clear solos</string>
+    <string name="sound_rules">M mutes a channel. S solos it: while any channel is soloed, you hear only the soloed ones. Tap a channel to make it the big one and hear only it.</string>
+
+    <!-- Channels -->
+    <string name="channels_hint">Switch channels on or off, drag ⠿ to reorder, and tap a channel to edit it. Off-air channels and Knesset broadcasts appear on Watch by themselves when they go live.</string>
+    <string name="action_find_knesset">Look for new Knesset broadcasts</string>
+    <string name="action_reset_channels">Reset channels</string>
+    <string name="action_add_channel">Add channel</string>
+    <string name="action_edit">Edit</string>
+    <string name="action_drag">Drag to reorder</string>
+    <string name="status_hidden">Off</string>
+    <string name="status_unlisted">Not listed on knesset.tv</string>
+    <string name="status_checking">Checking…</string>
+    <string name="status_live">Live</string>
+    <string name="status_off_air">Off air</string>
+    <string name="status_unreachable">Can\'t reach it</string>
+    <string name="status_web">Web page</string>
+    <string name="reset_channels_title">Reset channels?</string>
+    <string name="reset_channels_body">Go back to the built-in channels? Channels you added are removed; Knesset broadcasts are found again automatically.</string>
+    <string name="action_reset">Reset</string>
+    <string name="action_cancel">Cancel</string>
+    <string name="add_channel_title">Add channel</string>
+    <string name="edit_channel_title">Edit channel</string>
+    <string name="kind_stream">Live stream</string>
+    <string name="kind_page">Web page</string>
+    <string name="field_name">Name</string>
+    <string name="field_stream_address">Stream address</string>
+    <string name="field_page_address">Web page address</string>
+    <string name="field_stream_hint">An HLS address (.m3u8), an embed &lt;iframe&gt; code, or a watch.knesset.tv link</string>
+    <string name="field_page_hint">The page plays in its tile, showing just its video player when Local TV can find it.</string>
+    <string name="address_invalid">Enter a valid address</string>
+    <string name="field_description">Description (optional)</string>
+    <string name="action_test_stream">Test stream</string>
+    <string name="test_live">On air</string>
+    <string name="test_live_quality">On air, up to %1$dp</string>
+    <string name="test_off_air">Not broadcasting right now (%1$s). Local TV keeps checking once it\'s added.</string>
+    <string name="test_failed">Couldn\'t load it. The server may be offline or may not let other apps play it.</string>
+    <string name="field_meter">Show the level meter</string>
+    <string name="page_channel_note" formatted="false">Web pages play in the spotlight and grid only (not fullscreen or picture-in-picture), and their volume stops at 100%.</string>
+    <string name="action_save">Save</string>
+    <string name="action_remove">Remove</string>
+    <string name="channel_removed">Removed %1$s</string>
+    <string name="action_undo">Undo</string>
+
+    <!-- News -->
+    <string name="news_sources">News sources</string>
+    <string name="news_all">All</string>
+    <plurals name="news_problems">
+        <item quantity="one">%d source couldn\'t be loaded</item>
+        <item quantity="other">%d sources couldn\'t be loaded</item>
+    </plurals>
+    <string name="news_empty">No headlines yet. Pull down to refresh.</string>
+    <string name="news_no_sources">Choose the news sites you want to follow</string>
+    <string name="action_choose_sources">Choose sources</string>
+    <string name="news_new">New</string>
+    <string name="news_time_now">%1$s · now</string>
+    <string name="news_time_minutes">%1$s · %2$d min</string>
+    <string name="news_time_yesterday">Yesterday %1$s</string>
+    <string name="action_back">Back</string>
+    <string name="action_reset_sources">Reset sources</string>
+    <string name="sources_hebrew">Hebrew</string>
+    <string name="sources_english">English</string>
+    <string name="sources_yours">Added by you</string>
+    <string name="action_add_source">Add source</string>
+    <string name="reset_sources_title">Reset news sources?</string>
+    <string name="reset_sources_body">Go back to the built-in news sources, with the default ones switched on? Sources you added are removed.</string>
+    <string name="status_loading">Loading…</string>
+    <plurals name="headline_count">
+        <item quantity="one">%d headline</item>
+        <item quantity="other">%d headlines</item>
+    </plurals>
+    <string name="feed_unreachable">Can\'t reach %1$s</string>
+    <string name="feed_blocked">Blocked by this network\'s web filter</string>
+    <string name="feed_http_error">The site answered HTTP %1$s</string>
+    <string name="feed_web_page">This address is a web page, not a feed</string>
+    <string name="feed_not_a_feed">Not an RSS or Atom feed</string>
+    <string name="feed_page_without_feed">This web page doesn\'t name a feed</string>
+    <string name="add_source_title">Add news source</string>
+    <string name="edit_source_title">Edit news source</string>
+    <string name="field_feed_address">Feed address</string>
+    <string name="field_feed_hint">An RSS or Atom feed, or a news site\'s home page</string>
+    <string name="action_test_feed">Test feed</string>
+    <plurals name="feed_found">
+        <item quantity="one">Works: %d headline</item>
+        <item quantity="other">Works: %d headlines</item>
+    </plurals>
+    <plurals name="feed_found_on_page">
+        <item quantity="one">Found the site\'s feed: %d headline</item>
+        <item quantity="other">Found the site\'s feed: %d headlines</item>
+    </plurals>
+    <string name="source_removed">Removed %1$s</string>
+
+    <!-- Messages -->
+    <string name="event_new_knesset">New Knesset broadcast: %1$s</string>
+    <plurals name="event_new_knesset_many">
+        <item quantity="one">%d new Knesset broadcast</item>
+        <item quantity="other">%d new Knesset broadcasts</item>
+    </plurals>
+    <string name="event_went_live">%1$s is live</string>
+    <plurals name="event_refreshed">
+        <item quantity="one">Refreshed · %d channel on screen</item>
+        <item quantity="other">Refreshed · %d channels on screen</item>
+    </plurals>
+    <plurals name="event_refreshed_off_air">
+        <item quantity="one">, %d off air</item>
+        <item quantity="other">, %d off air</item>
+    </plurals>
+    <plurals name="event_refreshed_new">
+        <item quantity="one">, %d new</item>
+        <item quantity="other">, %d new</item>
+    </plurals>
+    <string name="event_discovery_failed">Couldn\'t check knesset.tv for new broadcasts</string>
+    <string name="event_channels_reset">Channels reset to the built-in list</string>
+    <string name="event_sources_reset">News sources reset to the built-in list</string>
+    <string name="event_sound_stopped">Sound turned off: another app started playing, or the headphones were unplugged</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Settings</string>
+    <string name="settings_watching">Watching</string>
+    <string name="settings_data_saver">Save data in the grid</string>
+    <string name="settings_data_saver_summary">Grid tiles play at most 480p; the spotlight and fullscreen channel play at full quality</string>
+    <string name="settings_meters_summary">Green bars on each tile show its sound level, even while it\'s muted</string>
+    <string name="settings_pip">Picture-in-picture</string>
+    <string name="settings_pip_summary">Leaving the app keeps the spotlight channel playing in a small window</string>
+    <string name="settings_keep_screen_on">Keep the screen on</string>
+    <string name="settings_keep_screen_on_summary">While channels are on screen</string>
+    <string name="settings_colors">Colors</string>
+    <string name="settings_theme">Theme</string>
+    <string name="theme_system">System</string>
+    <string name="theme_light">Light</string>
+    <string name="theme_dark">Dark</string>
+    <string name="settings_dynamic_color">Wallpaper colors</string>
+    <string name="settings_dynamic_color_summary">Use colors from your wallpaper</string>
+    <string name="settings_accent">Accent color</string>
+    <string name="accent_option">Color %1$d</string>
+    <string name="settings_pure_black">Pure black</string>
+    <string name="settings_pure_black_summary">Black backgrounds in the dark theme, for OLED screens</string>
+    <string name="settings_language">Language</string>
+    <string name="language_system">System default</string>
+    <string name="language_hebrew">עברית</string>
+    <string name="language_english">English</string>
+    <string name="settings_about">About</string>
+    <string name="about_version">Local TV %1$s</string>
+    <string name="about_license">Free and open source (GPL-3.0) · source code on GitHub</string>
+    <string name="about_updates">Updates</string>
+    <string name="about_updates_summary">New versions are published on GitHub</string>
+    <string name="about_privacy">Privacy</string>
+    <string name="about_privacy_summary">No accounts, no ads, no tracking</string>
+    <string name="action_report">Report a problem</string>
+    <string name="about_disclaimer">Local TV is an independent app, not affiliated with the Knesset, Kan, Keshet, Reshet, Channel 14, Channel 16, TV10, i24NEWS, Channel 9 or any news site. It plays the broadcasters\' own public live streams and pages, and opens articles on their own sites.</string>
+    <string name="copied">Copied</string>
+    <string name="no_browser">No app can open this link</string>
+
+    <!-- Crash report -->
+    <string name="crash_title">Local TV stopped</string>
+    <string name="crash_body">Local TV closed unexpectedly last time. You can copy the details, or send them as a GitHub issue to help fix it.</string>
+    <string name="crash_copy">Copy details</string>
+    <string name="crash_report">Report</string>
+    <string name="action_dismiss">Dismiss</string>
+</resources>

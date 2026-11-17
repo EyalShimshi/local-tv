@@ -1,0 +1,255 @@
+name: Build
+
+on:
+  push:
+    branches: [main]
+    # A tag such as v1.0.0 makes an official release.
+    tags: ["v*"]
+  workflow_dispatch:
+  schedule:
+    # Weekly, so the cached signing key is never evicted (GitHub drops caches unused for 7 days).
+    - cron: "17 3 * * 1"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: build-${{ github.ref }}-${{ github.event_name }}
+  cancel-in-progress: true
+
+env:
+  KEYSTORE_CACHE_KEY: localtv-debug-keystore-v1
+
+jobs:
+  keep-signing-key:
+    if: github.event_name == 'schedule'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Touch the cached debug signing key
+        uses: actions/cache/restore@v4
+        with:
+          path: ~/.android/debug.keystore
+          key: ${{ env.KEYSTORE_CACHE_KEY }}
+
+  android:
+    if: github.event_name != 'schedule'
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    defaults:
+      run:
+        working-directory: android
+    steps:
+      - name: Check out the code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Set up Gradle 9.5.0
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "9.5.0"
+
+      # Every build is signed with the same key so a new APK installs over the previous one,
+      # until the release key is added as repository secrets (see MAINTAINING.md).
+      - name: Restore the debug signing key
+        id: keystore
+        uses: actions/cache/restore@v4
+        with:
+          path: ~/.android/debug.keystore
+          key: ${{ env.KEYSTORE_CACHE_KEY }}
+
+      - name: Restore the release signing key
+        env:
+          KEYSTORE_BASE64: ${{ secrets.RELEASE_KEYSTORE_BASE64 }}
+        run: |
+          if [ -z "$KEYSTORE_BASE64" ]; then
+            echo "No release key: signing with the cached build key (see MAINTAINING.md)."
+            exit 0
+          fi
+          echo "$KEYSTORE_BASE64" | base64 -d > "$RUNNER_TEMP/release.keystore"
+          echo "RELEASE_KEYSTORE_FILE=$RUNNER_TEMP/release.keystore" >> "$GITHUB_ENV"
+
+      - name: Build the release APK
+        id: build
+        env:
+          RELEASE_KEYSTORE_PASSWORD: ${{ secrets.RELEASE_KEYSTORE_PASSWORD }}
+          APP_VERSION_NAME: ${{ github.ref_type == 'tag' && github.ref_name || '' }}
+        run: |
+          set -o pipefail
+          gradle assembleRelease 2>&1 | tee build.log
+
+      # Collects the useful error lines so they can be copied from the run's Summary page.
+      - name: Show build errors in the summary
+        if: failure() && steps.build.outcome == 'failure'
+        run: |
+          {
+            echo "## Build errors"
+            echo '```'
+            grep -E '^e: ' build.log | head -n 120 || true
+            grep -E -A 12 '^\* What went wrong' build.log | head -n 80 || true
+            grep -E 'AAPT: error|error: resource|ERROR:' build.log | head -n 40 || true
+            rules=app/build/outputs/mapping/release/missing_rules.txt
+            if [ -f "$rules" ]; then
+              echo "R8 suggests adding these lines to android/app/proguard-rules.pro:"
+              cat "$rules"
+            fi
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Save the debug signing key
+        if: steps.keystore.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: ~/.android/debug.keystore
+          key: ${{ env.KEYSTORE_CACHE_KEY }}
+
+      - name: Run unit tests
+        id: tests
+        run: |
+          set -o pipefail
+          gradle testDebugUnitTest 2>&1 | tee test.log
+
+      - name: Show test failures in the summary
+        if: failure() && steps.tests.outcome == 'failure'
+        run: |
+          {
+            echo "## Test failures"
+            echo '```'
+            grep -E -B 2 -A 8 'FAILED$|^e: ' test.log | head -n 150 || true
+            grep -E -A 12 '^\* What went wrong' test.log | head -n 40 || true
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Name the APK
+        run: |
+          if [ "${{ github.ref_type }}" = "tag" ]; then label="${{ github.ref_name }}"; else label="${{ github.run_number }}"; fi
+          cp app/build/outputs/apk/release/app-release.apk "$GITHUB_WORKSPACE/local-tv-$label.apk"
+          # Decodes crash reports from this build; zipped, it's a tenth of the size.
+          cp app/build/outputs/mapping/release/mapping.txt "$GITHUB_WORKSPACE/mapping-$label.txt"
+          (cd "$GITHUB_WORKSPACE" && zip -q -9 "mapping-$label.zip" "mapping-$label.txt")
+          echo "APK_LABEL=$label" >> "$GITHUB_ENV"
+
+      # R8 can remove code that's only reached by reflection, which shows only when the app runs,
+      # so nothing is published until the APK has opened and played on an emulator.
+      - name: Let the emulator use hardware acceleration
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - name: Smoke test on an emulator
+        id: smoke
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          target: google_apis
+          arch: x86_64
+          disable-animations: true
+          script: bash .github/scripts/smoke-test.sh local-tv-${{ env.APK_LABEL }}.apk mapping-${{ env.APK_LABEL }}.txt
+
+      - name: Upload the APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: android
+          path: |
+            local-tv-${{ env.APK_LABEL }}.apk
+            mapping-${{ env.APK_LABEL }}.zip
+
+      - name: Upload the smoke test's screenshots
+        if: always() && steps.smoke.outcome != 'skipped'
+        uses: actions/upload-artifact@v4
+        with:
+          name: smoke-test
+          path: |
+            smoke-*.png
+            decoded.txt
+          if-no-files-found: ignore
+
+  desktop:
+    if: github.event_name != 'schedule'
+    runs-on: windows-latest
+    timeout-minutes: 20
+    steps:
+      - name: Check out the code
+        uses: actions/checkout@v4
+
+      - name: Build LocalTV.exe
+        shell: cmd
+        run: host\build.cmd
+
+      - name: Package the desktop app
+        shell: pwsh
+        run: |
+          $label = if ('${{ github.ref_type }}' -eq 'tag') { '${{ github.ref_name }}' } else { '${{ github.run_number }}' }
+          New-Item -ItemType Directory -Force -Path package/LocalTV | Out-Null
+          Copy-Item LocalTV.exe package/LocalTV/
+          Copy-Item -Recurse app package/LocalTV/app
+          Copy-Item DESKTOP.md package/LocalTV/README.md
+          Copy-Item LICENSE package/LocalTV/LICENSE.txt
+          Compress-Archive -Path package/LocalTV -DestinationPath "local-tv-windows-$label.zip"
+
+      - name: Upload the desktop app
+        uses: actions/upload-artifact@v4
+        with:
+          name: desktop
+          path: local-tv-windows-*.zip
+
+  publish:
+    needs: [android, desktop]
+    # The APK is published even if the Windows build failed.
+    if: always() && github.event_name != 'schedule' && needs.android.result == 'success'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the release notes
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: RELEASE_NOTES.md
+          sparse-checkout-cone-mode: false
+
+      - name: Collect the builds
+        uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+
+      - name: List what will be published
+        run: ls -la dist
+
+      - name: Publish a GitHub pre-release
+        if: github.ref_type == 'branch'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: build-${{ github.run_number }}
+          name: Local TV build ${{ github.run_number }}
+          target_commitish: ${{ github.sha }}
+          prerelease: true
+          files: |
+            dist/local-tv-${{ github.run_number }}.apk
+            dist/mapping-${{ github.run_number }}.zip
+            dist/local-tv-windows-${{ github.run_number }}.zip
+            dist/smoke-*.png
+          body: |
+            Development build ${{ github.run_number }} (version 1.0-dev.${{ github.run_number }}) of commit ${{ github.sha }}.
+
+            **Android:** open this page on your phone and tap `local-tv-${{ github.run_number }}.apk`, or run `adb install -r local-tv-${{ github.run_number }}.apk`. Android 12 or newer.
+            **Windows:** unzip `local-tv-windows-${{ github.run_number }}.zip` and run `LocalTV.exe`.
+            The `smoke-*.png` files are screenshots from the emulator test this build passed.
+
+      - name: Publish the release
+        if: github.ref_type == 'tag'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: Local TV ${{ github.ref_name }}
+          prerelease: false
+          make_latest: true
+          files: |
+            dist/local-tv-${{ github.ref_name }}.apk
+            dist/mapping-${{ github.ref_name }}.zip
+            dist/local-tv-windows-${{ github.ref_name }}.zip
+          body_path: RELEASE_NOTES.md
+          fail_on_unmatched_files: false

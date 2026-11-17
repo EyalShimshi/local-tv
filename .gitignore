@@ -1,0 +1,28 @@
+# Desktop build output (CI attaches it to every release)
+/*.exe
+
+# Gradle / Android build output
+.gradle/
+.kotlin/
+build/
+captures/
+*.apk
+*.aab
+
+# Local machine configuration
+local.properties
+.idea/
+*.iml
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Signing material must never be committed
+*.jks
+*.keystore
+keystore.properties
+RELEASE_KEYSTORE_*.txt
+
+# Scratch copies left by editing tools
+*.new
+node_modules/

@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Local TV</string>
+
+    <!-- Tabs -->
+    <string name="nav_watch">צפייה</string>
+    <string name="nav_channels">ערוצים</string>
+    <string name="nav_news">חדשות</string>
+
+    <!-- Watch -->
+    <string name="watch_checking">בודק אילו ערוצים משדרים…</string>
+    <string name="watch_none_title">אין ערוצים פעילים</string>
+    <string name="watch_none_body">אפשר להפעיל את הערוצים שרוצים לראות במסך הערוצים.</string>
+    <string name="action_choose_channels">בחירת ערוצים</string>
+    <string name="watch_off_air_title">אין שידור כרגע</string>
+    <plurals name="watch_off_air_body">
+        <item quantity="one">הערוץ שלך לא משדר כרגע. הוא יופיע כאן מעצמו כשהשידור יתחיל.</item>
+        <item quantity="two">שני הערוצים שלך לא משדרים כרגע. הם יופיעו כאן מעצמם כשהשידור יתחיל.</item>
+        <item quantity="other">כל %d הערוצים שלך לא משדרים כרגע. הם יופיעו כאן מעצמם כשהשידור יתחיל.</item>
+    </plurals>
+    <string name="action_refresh">רענון</string>
+    <string name="action_more">אפשרויות נוספות</string>
+    <string name="tile_size">גודל המשבצות</string>
+    <string name="tile_size_large">גדול (אחת בכל שורה)</string>
+    <string name="tile_size_medium">בינוני (שתיים זו לצד זו)</string>
+    <string name="tile_size_small">קטן (שלוש זו לצד זו)</string>
+    <string name="show_meters">מדי עוצמה</string>
+    <string name="action_spotlight">הגדלה וסולו</string>
+    <string name="audible">משמיע קול</string>
+    <string name="status_reconnecting">מתחבר מחדש…</string>
+    <string name="mute_letter">M</string>
+    <string name="solo_letter">S</string>
+    <string name="action_mute">השתקה</string>
+    <string name="action_solo">סולו</string>
+    <string name="state_on">פעיל</string>
+    <string name="state_off">כבוי</string>
+    <string name="action_fullscreen">מסך מלא</string>
+    <string name="action_close_preview">סגירה</string>
+    <string name="action_back_to_grid">חזרה לרשת</string>
+    <string name="action_exit_fullscreen">יציאה ממסך מלא</string>
+    <string name="action_previous_channel">הערוץ הקודם</string>
+    <string name="action_next_channel">הערוץ הבא</string>
+    <string name="action_move_earlier">הזזה למקום הקודם</string>
+    <string name="action_move_later">הזזה למקום הבא</string>
+
+    <!-- Sound -->
+    <string name="sound_title">שמע</string>
+    <string name="sound_volume">עוצמת קול</string>
+    <string name="percent_value">%1$d%%</string>
+    <string name="sound_boost_hint" formatted="false">מעל 100% מגביר ערוצים שקטים; מגביל שומר על צליל נקי.</string>
+    <string name="action_unmute_all">ביטול כל ההשתקות</string>
+    <string name="action_mute_all">השתקת הכול</string>
+    <string name="action_clear_solos">ביטול הסולו</string>
+    <string name="sound_rules">M משתיק ערוץ. S מעביר אותו לסולו: כל עוד יש ערוץ בסולו, שומעים רק את הערוצים שבסולו. הקשה על ערוץ מגדילה אותו ומשמיעה רק אותו.</string>
+
+    <!-- Channels -->
+    <string name="channels_hint">אפשר להפעיל ולכבות ערוצים, לגרור ⠿ כדי לשנות את הסדר ולהקיש על ערוץ כדי לערוך אותו. ערוצים שלא משדרים ושידורי הכנסת מופיעים במסך הצפייה מעצמם כשהשידור מתחיל.</string>
+    <string name="action_find_knesset">חיפוש שידורים חדשים בכנסת</string>
+    <string name="action_reset_channels">איפוס הערוצים</string>
+    <string name="action_add_channel">הוספת ערוץ</string>
+    <string name="action_edit">עריכה</string>
+    <string name="action_drag">גרירה לשינוי הסדר</string>
+    <string name="status_hidden">כבוי</string>
+    <string name="status_unlisted">לא מופיע ב־knesset.tv</string>
+    <string name="status_checking">בודק…</string>
+    <string name="status_live">משדר</string>
+    <string name="status_off_air">לא משדר</string>
+    <string name="status_unreachable">אין גישה</string>
+    <string name="status_web">דף אינטרנט</string>
+    <string name="reset_channels_title">לאפס את הערוצים?</string>
+    <string name="reset_channels_body">לחזור לערוצים המובנים? ערוצים שהוספת יימחקו, ושידורי הכנסת יימצאו שוב אוטומטית.</string>
+    <string name="action_reset">איפוס</string>
+    <string name="action_cancel">ביטול</string>
+    <string name="add_channel_title">הוספת ערוץ</string>
+    <string name="edit_channel_title">עריכת ערוץ</string>
+    <string name="kind_stream">שידור חי</string>
+    <string name="kind_page">דף אינטרנט</string>
+    <string name="field_name">שם</string>
+    <string name="field_stream_address">כתובת השידור</string>
+    <string name="field_page_address">כתובת הדף</string>
+    <string name="field_stream_hint">כתובת HLS ‏(m3u8), קוד הטמעה &lt;iframe&gt; או קישור watch.knesset.tv</string>
+    <string name="field_page_hint">הדף מוצג במשבצת שלו, ורק נגן הווידאו שלו נראה כש־Local TV מוצא אותו.</string>
+    <string name="address_invalid">יש להזין כתובת תקינה</string>
+    <string name="field_description">תיאור (לא חובה)</string>
+    <string name="action_test_stream">בדיקת השידור</string>
+    <string name="test_live">משדר</string>
+    <string name="test_live_quality">משדר, עד ‎%1$dp‏</string>
+    <string name="test_off_air">לא משדר כרגע (%1$s). אחרי ההוספה Local TV ימשיך לבדוק.</string>
+    <string name="test_failed">לא הצלחנו לטעון אותו. ייתכן שהשרת לא זמין, או שהוא לא מאפשר לאפליקציות אחרות לנגן אותו.</string>
+    <string name="field_meter">הצגת מד העוצמה</string>
+    <string name="page_channel_note" formatted="false">דפי אינטרנט מוצגים רק ברשת ובהגדלה (לא במסך מלא או בתמונה בתוך תמונה), והעוצמה שלהם מוגבלת ל־100%.</string>
+    <string name="action_save">שמירה</string>
+    <string name="action_remove">הסרה</string>
+    <string name="channel_removed">%1$s הוסר</string>
+    <string name="action_undo">ביטול</string>
+
+    <!-- News -->
+    <string name="news_sources">מקורות חדשות</string>
+    <string name="news_all">הכול</string>
+    <plurals name="news_problems">
+        <item quantity="one">מקור אחד לא נטען</item>
+        <item quantity="two">שני מקורות לא נטענו</item>
+        <item quantity="other">%d מקורות לא נטענו</item>
+    </plurals>
+    <string name="news_empty">עדיין אין כותרות. אפשר למשוך למטה כדי לרענן.</string>
+    <string name="news_no_sources">בחירת אתרי החדשות שרוצים לעקוב אחריהם</string>
+    <string name="action_choose_sources">בחירת מקורות</string>
+    <string name="news_new">חדש</string>
+    <string name="news_time_now">%1$s · עכשיו</string>
+    <string name="news_time_minutes">%1$s · לפני %2$d דק׳</string>
+    <string name="news_time_yesterday">אתמול %1$s</string>
+    <string name="action_back">חזרה</string>
+    <string name="action_reset_sources">איפוס המקורות</string>
+    <string name="sources_hebrew">עברית</string>
+    <string name="sources_english">אנגלית</string>
+    <string name="sources_yours">נוספו על ידך</string>
+    <string name="action_add_source">הוספת מקור</string>
+    <string name="reset_sources_title">לאפס את מקורות החדשות?</string>
+    <string name="reset_sources_body">לחזור למקורות החדשות המובנים, עם מקורות ברירת המחדל פעילים? מקורות שהוספת יימחקו.</string>
+    <string name="status_loading">טוען…</string>
+    <plurals name="headline_count">
+        <item quantity="one">כותרת אחת</item>
+        <item quantity="two">שתי כותרות</item>
+        <item quantity="other">%d כותרות</item>
+    </plurals>
+    <string name="feed_unreachable">אין גישה ל־%1$s</string>
+    <string name="feed_blocked">חסום על ידי מסנן האינטרנט של הרשת הזאת</string>
+    <string name="feed_http_error">האתר החזיר HTTP %1$s</string>
+    <string name="feed_web_page">הכתובת היא דף אינטרנט, לא פיד</string>
+    <string name="feed_not_a_feed">זה לא פיד RSS או Atom</string>
+    <string name="feed_page_without_feed">הדף הזה לא מציין פיד</string>
+    <string name="add_source_title">הוספת מקור חדשות</string>
+    <string name="edit_source_title">עריכת מקור חדשות</string>
+    <string name="field_feed_address">כתובת הפיד</string>
+    <string name="field_feed_hint">פיד RSS או Atom, או דף הבית של אתר חדשות</string>
+    <string name="action_test_feed">בדיקת הפיד</string>
+    <plurals name="feed_found">
+        <item quantity="one">עובד: כותרת אחת</item>
+        <item quantity="two">עובד: שתי כותרות</item>
+        <item quantity="other">עובד: %d כותרות</item>
+    </plurals>
+    <plurals name="feed_found_on_page">
+        <item quantity="one">נמצא הפיד של האתר: כותרת אחת</item>
+        <item quantity="two">נמצא הפיד של האתר: שתי כותרות</item>
+        <item quantity="other">נמצא הפיד של האתר: %d כותרות</item>
+    </plurals>
+    <string name="source_removed">%1$s הוסר</string>
+
+    <!-- Messages -->
+    <string name="event_new_knesset">שידור חדש בכנסת: %1$s</string>
+    <plurals name="event_new_knesset_many">
+        <item quantity="one">שידור חדש אחד בכנסת</item>
+        <item quantity="two">שני שידורים חדשים בכנסת</item>
+        <item quantity="other">%d שידורים חדשים בכנסת</item>
+    </plurals>
+    <string name="event_went_live">%1$s משדר עכשיו</string>
+    <plurals name="event_refreshed">
+        <item quantity="one">רוענן · ערוץ אחד במסך</item>
+        <item quantity="two">רוענן · שני ערוצים במסך</item>
+        <item quantity="other">רוענן · %d ערוצים במסך</item>
+    </plurals>
+    <plurals name="event_refreshed_off_air">
+        <item quantity="one">, אחד לא משדר</item>
+        <item quantity="two">, שניים לא משדרים</item>
+        <item quantity="other">, %d לא משדרים</item>
+    </plurals>
+    <plurals name="event_refreshed_new">
+        <item quantity="one">, אחד חדש</item>
+        <item quantity="two">, שניים חדשים</item>
+        <item quantity="other">, %d חדשים</item>
+    </plurals>
+    <string name="event_discovery_failed">לא הצלחנו לבדוק ב־knesset.tv אם יש שידורים חדשים</string>
+    <string name="event_channels_reset">הערוצים אופסו לרשימה המובנית</string>
+    <string name="event_sources_reset">מקורות החדשות אופסו לרשימה המובנית</string>
+    <string name="event_sound_stopped">הקול כובה: אפליקציה אחרת התחילה לנגן, או שהאוזניות נותקו</string>
+
+    <!-- Settings -->
+    <string name="settings_title">הגדרות</string>
+    <string name="settings_watching">צפייה</string>
+    <string name="settings_data_saver">חיסכון בנתונים ברשת</string>
+    <string name="settings_data_saver_summary">המשבצות ברשת מנוגנות עד 480p; הערוץ המוגדל וערוץ המסך המלא מנוגנים באיכות מלאה</string>
+    <string name="settings_meters_summary">פסים ירוקים בכל משבצת מראים את עוצמת הקול שלה, גם כשהיא מושתקת</string>
+    <string name="settings_pip">תמונה בתוך תמונה</string>
+    <string name="settings_pip_summary">ביציאה מהאפליקציה הערוץ המוגדל ממשיך להתנגן בחלון קטן</string>
+    <string name="settings_keep_screen_on">השארת המסך דלוק</string>
+    <string name="settings_keep_screen_on_summary">כל עוד יש ערוצים על המסך</string>
+    <string name="settings_colors">צבעים</string>
+    <string name="settings_theme">ערכת נושא</string>
+    <string name="theme_system">מערכת</string>
+    <string name="theme_light">בהירה</string>
+    <string name="theme_dark">כהה</string>
+    <string name="settings_dynamic_color">צבעי הטפט</string>
+    <string name="settings_dynamic_color_summary">שימוש בצבעים מהטפט שלך</string>
+    <string name="settings_accent">צבע הדגשה</string>
+    <string name="accent_option">צבע %1$d</string>
+    <string name="settings_pure_black">שחור מלא</string>
+    <string name="settings_pure_black_summary">רקע שחור בערכה הכהה, למסכי OLED</string>
+    <string name="settings_language">שפה</string>
+    <string name="language_system">ברירת המחדל של המערכת</string>
+    <string name="language_hebrew">עברית</string>
+    <string name="language_english">English</string>
+    <string name="settings_about">אודות</string>
+    <string name="about_version">Local TV %1$s</string>
+    <string name="about_license">תוכנה חופשית בקוד פתוח (GPL-3.0) · קוד המקור ב־GitHub</string>
+    <string name="about_updates">עדכונים</string>
+    <string name="about_updates_summary">גרסאות חדשות מתפרסמות ב־GitHub</string>
+    <string name="about_privacy">פרטיות</string>
+    <string name="about_privacy_summary">בלי חשבונות, בלי פרסומות, בלי מעקב</string>
+    <string name="action_report">דיווח על בעיה</string>
+    <string name="about_disclaimer">Local TV היא אפליקציה עצמאית שאינה קשורה לכנסת, לכאן, לקשת, לרשת, לעכשיו 14, לערוץ 16, לערוץ 10, ל־i24NEWS, לערוץ 9 או לאתר חדשות כלשהו. היא מנגנת את השידורים החיים והדפים הציבוריים של הגופים המשדרים עצמם, ופותחת כתבות באתרים שלהם.</string>
+    <string name="copied">הועתק</string>
+    <string name="no_browser">אין אפליקציה שיכולה לפתוח את הקישור</string>
+
+    <!-- Crash report -->
+    <string name="crash_title">Local TV נסגרה</string>
+    <string name="crash_body">Local TV נסגרה באופן לא צפוי בפעם הקודמת. אפשר להעתיק את הפרטים, או לשלוח אותם כדיווח ב־GitHub כדי לעזור לתקן.</string>
+    <string name="crash_copy">העתקת הפרטים</string>
+    <string name="crash_report">דיווח</string>
+    <string name="action_dismiss">סגירה</string>
+</resources>

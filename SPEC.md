@@ -1,0 +1,119 @@
+# Local TV – specification and decisions
+
+The memory of the project: what was asked, what was decided and why, and how it's built. Read it
+before changing behavior. User-facing documentation is in [README.md](README.md) and
+[DESKTOP.md](DESKTOP.md); the release process in [MAINTAINING.md](MAINTAINING.md).
+
+## 1. Goal
+
+A multiview dashboard for Israeli live TV: several channels at once, a mixer to choose what you
+hear, automatic discovery of Knesset broadcasts, and a news feed beside the video. It started as a
+Windows app (WebView2 + HTML/JS) and now also ships as a native Android app built the way
+[Shidur](https://github.com/EyalShimshi/shidur) is built: Kotlin, Jetpack Compose, Material 3,
+Media3, with GitHub Actions as the only build machine.
+
+## 2. Requirements
+
+Every request so far, in order, and where it stands on each platform.
+
+| # | Request | Windows | Android |
+|---|---|---|---|
+| R1 | Play the Knesset Channel embed in its own window | ✅ | ✅ (paste the embed code in Add channel; the Knesset Channel is built in) |
+| R2 | All live channels from knesset.tv/live, a control dashboard with multiview, channel management, M and S per channel | ✅ | ✅ |
+| R3 | Add channels 11, 12 and 13 | ✅ | ✅ (12 through Mako's page, see D-08) |
+| R4 | Check knesset.tv for new streams on every start; hide streams that are off air; a global refresh | ✅ | ✅ (start, every 5 min, refresh) |
+| R5 | Show Keshet 12 inside the app despite its restrictions | ✅ | ✅ best effort (D-08) |
+| R6 | Several channels in S at once; sound from all soloed channels | ✅ | ✅ |
+| R7 | Every channel muted (M) when the app opens | ✅ | ✅ (mute/solo are never saved) |
+| R8 | Fullscreen inside the app's window, custom window controls | ✅ | ✅ adapted: fullscreen fills the app's window (the whole phone, or just the app's window in split screen) |
+| R9 | No per-channel volume sliders | ✅ | ✅ (one master volume) |
+| R10 | Volume above 100% for a boost | ✅ (200%, limiter) | ✅ (200%, soft limiter) |
+| R11 | Good on a vertical monitor; a zoom for tile size | ✅ | ✅ (tile size: 1, 2 or 3 per row on an upright phone) |
+| R12 | Slightly smaller so two tiles fit side by side | ✅ | ✅ (Medium, the default) |
+| R13 | Channels 14, 16, 10 and other worthwhile channels | ✅ | ✅ (+ i24NEWS, and off by default: i24NEWS English, Kan Educational, Makan 33, Channel 9) |
+| R14 | RSS news from popular outlets; collect many, activate the chosen ones | ✅ | ✅ (33 sources, 5 on) |
+| R15 | A button on every stream to spotlight it and solo its sound; another one switches | ✅ (center button, Enter) | ✅ (tap the tile) |
+| R16 | Drag tiles to rearrange | ✅ | ✅ (long-press and drag) |
+| R17 | Hide the green meter on any stream | ✅ | ✅ (per channel and all) |
+| R18 | A mobile app, the Shidur way, in a public repo with an installable APK release | – | ✅ this round ([docs/rounds/01-android-app.md](docs/rounds/01-android-app.md)) |
+
+## 3. Decision log
+
+Decisions made without the owner (he asked for no questions in the Android round); each can be
+revisited.
+
+| # | Decision | Why |
+|---|---|---|
+| D-01 | One repository for both apps: the Windows app stays at the root (`app/`, `host/`), Android in `android/` | The Windows app keeps working from the same folder; one place for issues, releases and docs |
+| D-02 | Native Kotlin + Compose + Material 3 + Media3 ExoPlayer, the Shidur toolchain (AGP 9.2.1, Kotlin 2.3.21, Gradle 9.5.0, compileSdk 37, minSdk 31) | Proven to build in CI with the same pipeline; native players handle several HLS streams better than a WebView, and allow real level meters and boost |
+| D-03 | Package `io.github.eyalshimshi.localtv`, name "Local TV", English and Hebrew, GPL-3.0-or-later | Same conventions as Shidur |
+| D-04 | One ExoPlayer per channel on screen; players start muted; the app holds one audio focus for all of them | Several players asking for focus would pause each other |
+| D-05 | Grid tiles capped at 480p, the spotlight/fullscreen channel unlimited (setting, on by default) | Phones have a limited number of video decoders, data and battery |
+| D-06 | Level meter and boost in a Media3 audio processor in each player's audio path, measuring before the volume | Same behavior as the desktop (a muted channel still shows activity) without the RECORD_AUDIO permission a Visualizer would need |
+| D-07 | Channels you can hear keep playing (sound only) while you're on another tab; everything stops when the app leaves the screen, except picture-in-picture | Watch-and-read is the main use; background playback would need a media service and notification (a later round) |
+| D-08 | Channel 12 = Mako's live page in a WebView with a desktop User-Agent, showing only the player; `page-helper.js` is injected into every frame (androidx.webkit document-start scripts) and follows M/S | Mako's streams play only in Mako's player (as found for the desktop); every frame so that a player inside an iframe still starts muted |
+| D-09 | Knesset discovery, stream checks, merge rules, feed parsing and mixer rules ported 1:1 from `app/app.js` into plain Kotlin with unit tests | Both apps behave the same; the rules are testable without Android |
+| D-10 | jsoup for knesset.tv and for feeds (its XML parser is forgiving), plus the desktop's regex fallback for broken feeds; the server's or document's charset, else UTF-8 | Israeli feeds include windows-1255 and imperfect XML |
+| D-11 | Streams and pages are requested with the phone's own WebView User-Agent | Sites treat Local TV like the browser on the same phone |
+| D-12 | Dark theme by default; Material 3 with a blue accent from the icon, wallpaper colors optional | Video looks best on dark; the desktop app is dark |
+| D-13 | Bottom navigation: Watch, Channels, News; Settings from the menus; a navigation rail on wide screens | Three daily tasks, one tap each |
+| D-14 | Signing with a key created by CI and kept in the Actions cache, the same for every build; a workflow to create a release key later | An installable APK now, with updates installing over each other; see MAINTAINING.md for the public-repo cache risk |
+| D-15 | Every push: build, unit tests, emulator smoke test with a public test stream, then a pre-release; a `v*` tag makes the full release; the Windows app is built in the same run and attached | Nothing is published unless the shrunk APK actually runs; Israeli streams may not be reachable from GitHub's servers |
+| D-16 | `localtv://play?url=…&name=…` previews a stream in the spotlight without saving it | Lets the smoke test (and anyone) open a stream directly, without adding channels from outside the app |
+| D-17 | Smoke-test screenshots are attached to pre-releases | The owner (and the agent) can see each build's UI without a device |
+| D-18 | Version 1.0.0 for the first Android release; development builds are 1.0-dev.N | Feature parity with the desktop app |
+
+## 4. Architecture (Android)
+
+```
+MainActivity ── LocalTvApp (Compose: Watch · Channels · News · Settings, fullscreen, PiP)
+      │                 │
+      └── LocalTvViewModel ──────────────┬── ChannelStore (prefs) ← assets/channels.json
+            │  availability, mix,        ├── NewsController ── NewsStore (prefs) ← assets/news.json
+            │  spotlight/fullscreen      ├── KnessetDiscovery ── Http (HttpURLConnection) ── jsoup
+            │                            ├── StreamCheck (is the playlist live?)
+            └── PlayerPool ── TilePlayer (ExoPlayer + LevelMeterProcessor) per channel
+                     └── AudioFocus (one request for the app)
+```
+
+- **Shown channels** = switched on, listed on knesset.tv (for Knesset streams), and live (or
+  unreachable, which the player keeps retrying), plus a previewed link.
+- **Mixer** (`MixState`): sets of unmuted and soloed ids. Audible = unmuted and (no shown channel
+  soloed, or soloed). Spotlight = one channel unmuted and soloed. Gains = (master volume)² for
+  audible channels; above 1 the gain goes to the audio processor, with a soft limiter.
+- **Players** are acquired by the composables that show them (`rememberTilePlayer`, a
+  `RememberObserver`), released 5 seconds after they leave the screen unless audible, retried with
+  backoff (3–30 s) on errors, restarted when stuck, stopped when the app leaves the screen and
+  resumed at the live edge.
+- **Surfaces**: each player renders into a `TextureView`; when two views show the same channel
+  (spotlight and fullscreen), the newest one gets the picture and the previous one gets it back.
+
+## 5. Implementation notes
+
+| Spec says | We did | Why |
+|---|---|---|
+| Hide off-air streams | A channel is shown only after its playlist (or first variant) lists segments; off-air and unreachable channels are checked again every minute; a player that keeps failing triggers a check | The desktop's rule; avoids black tiles |
+| Fullscreen inside the app's window | `FullscreenPlayer` fills the activity's window, hides the system bars, and turns to landscape unless in multi-window | A phone app's window is the screen; in split screen it stays in its pane |
+| Spotlight + solo button in the middle of the tile | The whole tile is the button (tap) | Touch targets on a phone; long-press is drag |
+| Meter hide per stream | `Channel.meter` (in the channel's edit dialog) and a global switch | Same data as the desktop |
+| Volume sliders per channel removed | One master volume in the Sound sheet | R9 |
+| Zoom slider | Three tile sizes (`GridCells.Adaptive` 320/160/110 dp) | Predictable columns on phones and tablets |
+| Discovery every start | On ViewModel creation, every 5 minutes while visible, on returning after 5+ minutes, and on refresh | R4 |
+| Channel 12 inside the app | WebView with the page helper in every frame; volume ≤ 100%, no meter/fullscreen/PiP | D-08; a web page can't be in two places at once |
+
+## 6. Known limitations
+
+- Playback stops when the app leaves the screen (except picture-in-picture); no background audio
+  with a notification yet.
+- Channel 12 depends on Mako's page; if Mako shows a pop-up or needs a tap, use its player in the
+  spotlight. It can't be fullscreen or picture-in-picture.
+- Some streams are geo-restricted to Israel.
+- The CI signing key lives in the Actions cache (see MAINTAINING.md).
+
+## 7. Next options
+
+1. Background audio with a media notification (listen to the Knesset with the screen off).
+2. A home-screen widget or quick settings tile for the Knesset Channel.
+3. Remote channel/news lists (download updated `channels.json` from this repository) so fixes reach
+   installed apps without a new APK, like Shidur's catalog.
+4. A release signing key, then Google Play or F-Droid.

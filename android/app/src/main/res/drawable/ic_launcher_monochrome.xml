@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The launcher icon's shapes in one color, for themed icons. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M45,28 L54,37 L63,28"
+        android:strokeWidth="4"
+        android:strokeColor="#FFFFFF"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:fillType="evenOdd"
+        android:pathData="M35,37 H73 A8,8 0 0 1 81,45 V71 A8,8 0 0 1 73,79 H35 A8,8 0 0 1 27,71 V45 A8,8 0 0 1 35,37 Z M37,42 H71 A5,5 0 0 1 76,47 V69 A5,5 0 0 1 71,74 H37 A5,5 0 0 1 32,69 V47 A5,5 0 0 1 37,42 Z" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M37,45 H51 A2,2 0 0 1 53,47 V55 A2,2 0 0 1 51,57 H37 A2,2 0 0 1 35,55 V47 A2,2 0 0 1 37,45 Z M57,45 H71 A2,2 0 0 1 73,47 V55 A2,2 0 0 1 71,57 H57 A2,2 0 0 1 55,55 V47 A2,2 0 0 1 57,45 Z M37,59 H51 A2,2 0 0 1 53,61 V69 A2,2 0 0 1 51,71 H37 A2,2 0 0 1 35,69 V61 A2,2 0 0 1 37,59 Z M57,59 H71 A2,2 0 0 1 73,61 V69 A2,2 0 0 1 71,71 H57 A2,2 0 0 1 55,69 V61 A2,2 0 0 1 57,59 Z" />
+</vector>
