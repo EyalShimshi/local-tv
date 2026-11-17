@@ -11,6 +11,7 @@ import android.webkit.WebViewClient
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -49,18 +50,24 @@ fun PageView(channel: Channel, muted: Boolean, volume: Float, modifier: Modifier
             }
         }
         lifecycle.addObserver(observer)
-        onDispose {
-            lifecycle.removeObserver(observer)
-            webView.stopLoading()
-            webView.destroy()
-        }
+        onDispose { lifecycle.removeObserver(observer) }
     }
     LaunchedEffect(webView, muted, volume) {
         audio.muted = muted
         audio.volume = volume.coerceIn(0f, 1f)
         webView.evaluateJavascript(audio.script(), null)
     }
-    AndroidView(factory = { webView }, modifier = modifier)
+    key(webView) {
+        AndroidView(
+            factory = { webView },
+            // Only once the page is off the screen: a WebView mustn't be destroyed while it's shown.
+            onRelease = { view ->
+                view.stopLoading()
+                view.destroy()
+            },
+            modifier = modifier,
+        )
+    }
 }
 
 /** What the page's sound should be; re-applied whenever a page finishes loading. */

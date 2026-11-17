@@ -103,6 +103,21 @@ must_tap() {
 timeout 300 "$adb_bin" install -r -g "$apk" || fail "The APK didn't install"
 adb logcat -c || true
 
+# The phone's log and the build machine's memory, recorded as the test runs (an emulator that dies
+# leaves nothing to collect afterwards). Uploaded with the screenshots, not published.
+"$adb_bin" logcat -v threadtime -b main,system,crash > logcat.txt 2>&1 &
+logcat_pid=$!
+(
+  while true; do
+    emulator_pids=$(pgrep -d, -f qemu-system || true)
+    echo "$(date -u +%T) $(free -m | awk 'NR == 2 {print "used " $3 " MB, available " $7 " MB;"}')" \
+      "$(ps -o rss=,pcpu= -p "${emulator_pids:-0}" 2> /dev/null | awk '{rss += $1; cpu += $2} END {print "emulator " int(rss / 1024) " MB, " cpu "% CPU"}')"
+    sleep 5
+  done
+) > host.txt 2>&1 &
+monitor_pid=$!
+trap 'kill $logcat_pid $monitor_pid 2> /dev/null; { echo "--- Kernel messages ---"; sudo dmesg -T | tail -n 60; } >> host.txt 2>&1' EXIT
+
 echo "Opening Local TV"
 adb shell am start -W -n "$pkg/.MainActivity"
 sleep 15

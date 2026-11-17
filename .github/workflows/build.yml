@@ -141,6 +141,13 @@ jobs:
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
 
+      # The build's Gradle and Kotlin daemons hold several GB that the emulator can use.
+      - name: Free the build's memory
+        run: |
+          gradle --stop || true
+          pkill -f KotlinCompileDaemon || true
+          free -m
+
       - name: Smoke test on an emulator
         id: smoke
         timeout-minutes: 20
@@ -173,6 +180,8 @@ jobs:
           path: |
             smoke-*.png
             decoded.txt
+            logcat.txt
+            host.txt
           if-no-files-found: ignore
 
   desktop:
