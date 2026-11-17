@@ -30,6 +30,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -203,6 +204,17 @@ private fun WatchGrid(viewModel: LocalTvViewModel, watch: WatchState, settings: 
     val compact = settings.tileSize == TileSize.SMALL
     val moveEarlier = stringResource(R.string.action_move_earlier)
     val moveLater = stringResource(R.string.action_move_later)
+
+    // A lazy grid keeps its first visible item in place, so anything added above it would appear out
+    // of sight. A new spotlight channel is always brought into view (like the desktop app reveals
+    // it), and channels that come on air above the top tile are shown while the grid is at its top.
+    LaunchedEffect(spotlight?.id) {
+        if (spotlight != null) gridState.animateScrollToItem(0)
+    }
+    val firstKey = if (spotlight != null) SPOTLIGHT_KEY else gridChannels.firstOrNull()?.id
+    LaunchedEffect(firstKey) {
+        if (gridState.firstVisibleItemIndex <= 1) gridState.scrollToItem(0)
+    }
 
     fun move(channel: Channel, step: Int) {
         val index = ordered.indexOfFirst { it.id == channel.id }
