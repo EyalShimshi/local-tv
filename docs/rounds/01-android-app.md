@@ -93,4 +93,16 @@ decision log (every choice made without asking) and the architecture.
 
 ## Status
 
-Filled in when the release was published.
+- Released as **[Local TV v1.0.0](https://github.com/EyalShimshi/local-tv/releases/tag/v1.0.0)**:
+  `local-tv-v1.0.0.apk` (Android 12 or newer), `local-tv-windows-v1.0.0.zip` (the Windows app)
+  and `mapping-v1.0.0.zip` (decodes crash reports from this version).
+- Every build passes the same checks before anything is published: the R8-shrunk release build,
+  the unit tests (channel catalog, Knesset discovery, feed parsing, the M/S mixer rules, stream and
+  news helpers, the built-in lists), and the emulator test – install, live channels in the grid, a
+  test stream in the spotlight with its sound and meters, the Channels, News and Watch tabs,
+  Settings, and picture-in-picture on the home screen. Each development build ("Local TV build N"
+  in Releases) carries that run's screenshots.
+- In the emulator (in the US): Kan 11, Reshet 13, Now 14, Channel 16 and i24NEWS played in their
+  tiles; Channel 12 showed Mako's page for viewers abroad (from Israel that page has the live
+  player, which the Windows app plays); News showed N12 and ynet headlines.
+- Not checked: a real phone, and Channel 12 from Israel on Android.
