@@ -12,6 +12,9 @@ and a **Windows app**, with the same channels, the same sound rules and the same
 | Guide | [below](#the-android-app) | [DESKTOP.md](DESKTOP.md) |
 | Source | [`android/`](android) (Kotlin, Jetpack Compose, Media3) | [`app/`](app) and [`host/`](host) (HTML/JS in WebView2, C#) |
 
+How the Android app was made, what's in version 1.0.0 and how to try it:
+[docs/rounds/01-android-app.md](docs/rounds/01-android-app.md).
+
 ## Channels
 
 | Channel | Source | Starts |

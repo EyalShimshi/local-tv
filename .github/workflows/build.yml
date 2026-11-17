@@ -159,9 +159,9 @@ jobs:
           cores: 4
           ram-size: 4096M
           disable-animations: true
-          # The emulator's host-side video decoder crashed the whole emulator once several channels
-          # played (build 2); the emulated phone decodes in software instead.
-          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -feature -HardwareDecoder
+          # Lavapipe, the emulator's current software renderer: with the older SwiftShader modes the
+          # whole emulator froze seconds after the test stream started (builds 2-5, SPEC.md D-19).
+          emulator-options: -no-window -gpu lavapipe -no-snapshot -noaudio -no-boot-anim
           script: bash .github/scripts/smoke-test.sh local-tv-${{ env.APK_LABEL }}.apk mapping-${{ env.APK_LABEL }}.txt
 
       - name: Upload the APK

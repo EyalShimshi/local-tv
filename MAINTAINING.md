@@ -26,6 +26,16 @@ Every push to `main` runs **Build** (`build.yml`):
    an Android 14 emulator: open the app, play a public test stream from a
    `localtv://play?url=…` link, open every tab and Settings, go to the home screen. Any crash fails
    the job (decoded with the build's R8 mapping file). Screenshots are kept as `smoke-*.png`.
+   The emulator draws with **Lavapipe** (`-gpu lavapipe`), its current software renderer: with
+   the older SwiftShader modes the whole emulator froze and quit seconds after the test stream
+   started next to the live channels (builds 2–5), and a one-off experiment across eight emulator
+   setups showed Lavapipe and SwANGLE pass. While the test runs it records the phone's log
+   (`logcat.txt`) and the build machine's memory (`host.txt`), kept with the screenshots in the
+   run's `smoke-test` artifact (not published), because a dead emulator leaves nothing to collect.
+   If one of the emulator's own apps stops responding, the test answers its dialog with **Wait**.
+   Every `adb` call has a time limit and the step stops after 20 minutes, so a frozen emulator
+   can't hold the pipeline. The Israeli channels play from GitHub's servers too, so the
+   screenshots show real channels.
 2. **desktop** (Windows): `host\build.cmd`, then `local-tv-windows-N.zip` (`LocalTV.exe`, `app/`,
    `DESKTOP.md` as `README.md`, `LICENSE`).
 3. **publish**: if the Android job passed, a **pre-release** named "Local TV build N" (tag

@@ -58,10 +58,11 @@ revisited.
 | D-12 | Dark theme by default; Material 3 with a blue accent from the icon, wallpaper colors optional | Video looks best on dark; the desktop app is dark |
 | D-13 | Bottom navigation: Watch, Channels, News; Settings from the menus; a navigation rail on wide screens | Three daily tasks, one tap each |
 | D-14 | Signing with a key created by CI and kept in the Actions cache, the same for every build; a workflow to create a release key later | An installable APK now, with updates installing over each other; see MAINTAINING.md for the public-repo cache risk |
-| D-15 | Every push: build, unit tests, emulator smoke test with a public test stream, then a pre-release; a `v*` tag makes the full release; the Windows app is built in the same run and attached | Nothing is published unless the shrunk APK actually runs; Israeli streams may not be reachable from GitHub's servers |
+| D-15 | Every push: build, unit tests, emulator smoke test with a public test stream, then a pre-release; a `v*` tag makes the full release; the Windows app is built in the same run and attached | Nothing is published unless the shrunk APK actually runs; a public test stream is always available, whatever is on air |
 | D-16 | `localtv://play?url=…&name=…` previews a stream in the spotlight without saving it | Lets the smoke test (and anyone) open a stream directly, without adding channels from outside the app |
 | D-17 | Smoke-test screenshots are attached to pre-releases | The owner (and the agent) can see each build's UI without a device |
 | D-18 | Version 1.0.0 for the first Android release; development builds are 1.0-dev.N | Feature parity with the desktop app |
+| D-19 | The emulator in CI draws with Lavapipe (`-gpu lavapipe`, the emulator's current software renderer), and the test plays a 512×288 stream | With the deprecated SwiftShader modes the whole emulated phone froze, then the emulator quit, seconds after the test stream started next to the live channels (builds 2–5; the phone's log shows the app running normally until everything stopped). An experiment across eight setups ([run 1](https://github.com/EyalShimshi/local-tv/actions/runs/44158250899), [repeat](https://github.com/EyalShimshi/local-tv/actions/runs/44160119649)): on Android 14, `swiftshader_indirect`, `swiftshader` and `software` froze; `lavapipe` and `swangle` passed 4 of 4. An emulator problem, not the app's |
 
 ## 4. Architecture (Android)
 
@@ -99,7 +100,8 @@ MainActivity ── LocalTvApp (Compose: Watch · Channels · News · Settings, 
 | Volume sliders per channel removed | One master volume in the Sound sheet | R9 |
 | Zoom slider | Three tile sizes (`GridCells.Adaptive` 320/160/110 dp) | Predictable columns on phones and tablets |
 | Discovery every start | On ViewModel creation, every 5 minutes while visible, on returning after 5+ minutes, and on refresh | R4 |
-| Channel 12 inside the app | WebView with the page helper in every frame; volume ≤ 100%, no meter/fullscreen/PiP | D-08; a web page can't be in two places at once |
+| Channel 12 inside the app | WebView with the page helper in every frame; volume ≤ 100%, no meter/fullscreen/PiP; the WebView is destroyed only after it has left the screen (`AndroidView.onRelease`) | D-08; a web page can't be in two places at once, and a WebView mustn't be destroyed while attached |
+| New channels and the spotlight must be visible | A new spotlight scrolls the grid to the top; channels that come on air above the top tile are shown while the grid is at its top | Lazy grids keep their first visible item in place, so items added above it appeared out of sight (found by the emulator test in build 1) |
 
 ## 6. Known limitations
 

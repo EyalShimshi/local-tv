@@ -56,9 +56,18 @@ in the [releases](https://github.com/EyalShimshi/local-tv/releases/latest).
 
 **Heads-up**
 
-- The app couldn't be tried on a real phone in Israel from here: CI tests it on an Android 14
-  emulator in the US with a public test stream (Israeli streams may be geo-blocked there). Channel
-  12 (Mako's page in a WebView) is the least certain part.
+- I couldn't try the app on a real phone. Every build runs on an Android 14 emulator in GitHub's
+  cloud (in the US): there Kan 11, Reshet 13, Now 14 and i24NEWS played live in their tiles with
+  their level meters, and a public test stream played in the spotlight; the screenshots are
+  attached to each pre-release. Channel 12 (Mako's page in a WebView) is the least certain part –
+  Mako may only serve Israel.
+- Several CI rounds were needed. The first showed that new tiles (and the spotlight) were added
+  above the screen, out of sight – fixed in the app. Then the emulated phone in GitHub's cloud
+  froze whenever the test stream started next to the live channels. Recording the phone's log
+  showed the app running normally until the whole emulator stopped, and an experiment across eight
+  emulator setups pinned it on the emulator's old software renderer; the test now uses its current
+  one (Lavapipe) and passes (details in SPEC.md, D-19). On the way, a web-page channel
+  (Channel 12) is now destroyed only after it has left the screen.
 - Signing: builds are signed with a key that CI keeps in its cache, so updates install over each
   other. Before sharing the app widely, move to a release key (MAINTAINING.md → Signing; one
   uninstall needed then), and set Actions → "Require approval for all external contributors".

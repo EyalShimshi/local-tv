@@ -82,15 +82,32 @@ wait_for_log() {
   return 1
 }
 
-# Taps the element whose $1 attribute (text or content-desc) is $2, found in the accessibility tree.
-tap() {
+# Saves the screen's accessibility tree to window.xml.
+dump_screen() {
   timeout 30 adb shell uiautomator dump /sdcard/window.xml > /dev/null
+  adb shell cat /sdcard/window.xml > window.xml 2> /dev/null
+}
+
+# Taps the element of window.xml whose $1 attribute (text or content-desc) is $2.
+tap_in_dump() {
   local bounds x1 y1 x2 y2
-  bounds=$(adb shell cat /sdcard/window.xml | grep -oE "$1=\"$2\"[^>]*bounds=\"[^\"]+\"" | head -n 1 |
+  bounds=$(grep -oE "$1=\"$2\"[^>]*bounds=\"[^\"]+\"" window.xml | head -n 1 |
     grep -oE '\[[0-9]+,[0-9]+\]\[[0-9]+,[0-9]+\]')
   if [ -z "$bounds" ]; then return 1; fi
   read -r x1 y1 x2 y2 <<< "$(echo "$bounds" | tr -c '0-9' ' ')"
   adb shell input tap $(((x1 + x2) / 2)) $(((y1 + y2) / 2))
+}
+
+# Taps the element on the screen whose $1 attribute (text or content-desc) is $2. A busy emulator's
+# own apps (such as its launcher) sometimes stop responding; their dialog is answered "Wait" first.
+tap() {
+  dump_screen
+  if grep -qE "isn(&apos;|')t responding" window.xml && tap_in_dump text "Wait"; then
+    echo "::warning::Answered an emulator app's \"isn't responding\" dialog with Wait"
+    sleep 2
+    dump_screen
+  fi
+  tap_in_dump "$1" "$2"
 }
 
 must_tap() {
