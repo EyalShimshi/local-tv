@@ -46,6 +46,7 @@ class Http(private val userAgent: () -> String) {
         var current = url.trim()
         repeat(MAX_REDIRECTS + 1) {
             if (!isHttpUrl(current)) throw IOException("Not a web address")
+            if (isBlockedAddress(current)) throw IOException("This site is blocked in Local TV")
             val address = try {
                 URI(current).toASCIIString()
             } catch (e: URISyntaxException) {

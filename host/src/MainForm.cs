@@ -27,6 +27,9 @@ sealed class MainForm : Form
     const int MaxFetchBytes = 4 * 1024 * 1024;
     const int MaxRedirects = 5;
 
+    // Sites Local TV never contacts: no page, frame, image, fetch, redirect or browser link.
+    static readonly string[] BlockedDomains = { "srugim.co.il" };
+
     static readonly HttpClient Http = CreateHttpClient();
     static readonly Regex DeclaredCharset = new(@"<\?xml[^>]*?\bencoding\s*=\s*[""']([\w.:-]+)|<meta[^>]+?charset\s*=\s*[""']?([\w.:-]+)", RegexOptions.IgnoreCase);
     static readonly HashSet<string> EditMenuItems = new(StringComparer.OrdinalIgnoreCase)
@@ -303,6 +306,17 @@ sealed class MainForm : Form
         userAgent = settings.UserAgent;
 
         core.SetVirtualHostNameToFolderMapping(AppHost, appFolder, CoreWebView2HostResourceAccessKind.Allow);
+        foreach (var domain in BlockedDomains)
+        {
+            foreach (var pattern in new[] { "*://" + domain + "/*", "*://*." + domain + "/*" })
+            {
+                core.AddWebResourceRequestedFilter(pattern, CoreWebView2WebResourceContext.All, CoreWebView2WebResourceRequestSourceKinds.All);
+            }
+        }
+        core.WebResourceRequested += (_, e) =>
+        {
+            if (IsBlocked(e.Request.Uri)) e.Response = environment.CreateWebResourceResponse(null, 403, "Blocked", "Content-Type: text/plain");
+        };
         core.WebMessageReceived += OnWebMessageReceived;
         core.NavigationStarting += OnNavigationStarting;
         core.NewWindowRequested += OnNewWindowRequested;
@@ -359,17 +373,18 @@ sealed class MainForm : Form
             var uri = HttpUri(url) ?? throw new ArgumentException("Only http and https addresses can be fetched.");
             for (var redirects = 0; ; redirects++)
             {
+                if (IsBlocked(uri.AbsoluteUri)) throw new ArgumentException("This site is blocked in Local TV.");
                 using var request = new HttpRequestMessage(HttpMethod.Get, uri);
                 if (!string.IsNullOrEmpty(userAgent)) request.Headers.TryAddWithoutValidation("User-Agent", userAgent);
                 request.Headers.TryAddWithoutValidation("Accept", "text/html,application/xhtml+xml,application/rss+xml,application/atom+xml,application/xml;q=0.9,text/xml;q=0.9,application/json;q=0.9,*/*;q=0.8");
                 request.Headers.TryAddWithoutValidation("Accept-Language", "he-IL,he;q=0.9,en-US;q=0.8,en;q=0.7");
                 using var response = await Http.SendAsync(request);
-                // .NET Framework follows other redirects by itself, but not 308 (Permanent Redirect).
+                // Redirects are followed here, one by one, so none can lead to a blocked site.
                 // A relative address counts from where the earlier redirects led.
-                if ((int)response.StatusCode == 308 && response.Headers.Location != null && redirects < MaxRedirects)
+                var status = (int)response.StatusCode;
+                if ((status is 301 or 302 or 303 or 307 or 308) && response.Headers.Location != null && redirects < MaxRedirects)
                 {
-                    var current = response.RequestMessage?.RequestUri ?? uri;
-                    uri = HttpUri(new Uri(current, response.Headers.Location).AbsoluteUri) ?? throw new ArgumentException("The address redirects somewhere that can't be fetched.");
+                    uri = HttpUri(new Uri(uri, response.Headers.Location).AbsoluteUri) ?? throw new ArgumentException("The address redirects somewhere that can't be fetched.");
                     continue;
                 }
                 result["ok"] = response.IsSuccessStatusCode;
@@ -497,7 +512,7 @@ sealed class MainForm : Form
     static void OpenExternal(string address)
     {
         var uri = HttpUri(address);
-        if (uri == null) return;
+        if (uri == null || IsBlocked(uri.AbsoluteUri)) return;
         try
         {
             Process.Start(new ProcessStartInfo(uri.AbsoluteUri) { UseShellExecute = true });
@@ -510,11 +525,22 @@ sealed class MainForm : Form
     static Uri HttpUri(string address) =>
         Uri.TryCreate(address, UriKind.Absolute, out var uri) && (uri.Scheme == Uri.UriSchemeHttps || uri.Scheme == Uri.UriSchemeHttp) ? uri : null;
 
+    static bool IsBlocked(string address)
+    {
+        if (!Uri.TryCreate(address, UriKind.Absolute, out var uri)) return false;
+        var host = uri.Host.TrimEnd('.').ToLowerInvariant();
+        foreach (var domain in BlockedDomains)
+        {
+            if (host == domain || host.EndsWith("." + domain, StringComparison.Ordinal)) return true;
+        }
+        return false;
+    }
+
     static HttpClient CreateHttpClient()
     {
         var handler = new HttpClientHandler
         {
-            AllowAutoRedirect = true,
+            AllowAutoRedirect = false,
             AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate,
             UseCookies = false,
         };

@@ -5,8 +5,9 @@
 
 A desktop multiview dashboard for live TV. It plays several channels side by side
 in its own window, with mixer-style **M** (mute) and **S** (solo) buttons, a
-volume slider that goes up to 200%, a live audio meter for every channel, and a
-News panel with headlines from the news sites you pick.
+volume slider that goes up to 200%, a live audio meter for every channel, a
+News panel with headlines from the news sites you pick, and a **Knesset view**
+that explains the Knesset's day in plain Hebrew.
 
 ## Start
 
@@ -88,7 +89,7 @@ Choose the sources in the channel manager's **News sources** tab (the list butto
 on the News panel opens it). Switch outlets on and off as with channels. These
 are on at first: ynet מבזקים, N12, מעריב מבזקים, הארץ and ישראל היום. Also
 built in, in Hebrew: ynet ראשי, N12 צבא וביטחון, N12 חדשות בעולם, מעריב,
-וואלה!, גלובס, ערוץ 7 מבזקים, סרוגים, כיכר השבת, בחדרי חרדים and רוטר; in
+וואלה!, גלובס, ערוץ 7 מבזקים, כיכר השבת, בחדרי חרדים and רוטר; in
 English: The Jerusalem Post, Haaretz, Ynetnews, Globes, BBC News, The Guardian,
 The New York Times, The Washington Post, CNBC, Sky News, Fox News, CBS News, NPR,
 Axios, France 24, DW and Euronews.
@@ -96,6 +97,38 @@ Axios, France 24, DW and Euronews.
 **Add news source** takes any RSS or Atom feed address, or a news site's home
 page when the page names its feed. **Test feed** checks it and fills in its name.
 If a network's web filter blocks a site, its row in the list says so.
+
+Some sites are blocked in Local TV altogether (the list is `BLOCKED_DOMAINS` in
+`app/app.js` and `BlockedDomains` in `host/src/MainForm.cs`): they can't be added
+as a source or a channel, saved ones are dropped, and the window refuses every
+request to them – pages, frames, feeds, redirects and links.
+
+## The Knesset view
+
+**Knesset** in the title bar (or `K`) opens a full-window view, in Hebrew, of the
+Knesset's day-to-day work. The channels keep playing underneath; `K` or `Esc`
+brings them back, and `F5` refreshes the view.
+
+| Tab | What it shows |
+| --- | --- |
+| היום (Today) | What's on air now (the plenum's current topic and the Knesset streams in the grid), today's plenum and committee sessions in time order with their agendas, cancelled and closed sessions, the next plenum sitting, the week ahead in the committees, and where the Knesset is in its year |
+| ועדות (Committees) | Every committee of the current Knesset by type, with its chair and next session; a committee's responsibilities, chair, members, substitutes, staff, contact details, upcoming and recent sessions, and press releases |
+| מליאה (Plenum) | The sittings; a sitting's discussed items by type, the items only laid on the table, its votes and its record (דברי הכנסת) |
+| הצבעות (Votes) | Every vote, newest first; a vote's result, totals and how each MK voted, by faction |
+| חקיקה (Legislation) | How a bill becomes law, every bill of the current Knesset with a stage bar (filter by stage, search), recently passed laws with their summaries; a bill's stage in plain words, initiators, committee, every session it was discussed in (with recordings) and documents |
+| חברי הכנסת (MKs) | The factions and their seats, all 120 MKs with photos and roles, who is in the building now; an MK's roles, committees, activity this Knesset and contact details |
+| ממשלה (Government) | The prime minister, ministers and deputy ministers, and whether it's a transitional government |
+| מדריך (Guide) | Short explanations (the Knesset, coalition and opposition, a working week, committees, the plenum and votes, how a law is made, oversight, secondary legislation, a new Knesset, the government), a 47-term glossary with search, and links to the Knesset's own pages |
+
+Session details show the invitees, the agenda with links, documents (protocols,
+background material, decisions) and press releases. **צפייה** (watch) on a live
+committee room or the plenum makes that stream the big channel in the grid, heard
+alone; recordings play in a player over the view, with the channels silenced
+until it closes. Links open the Knesset's website in your browser.
+
+The data comes straight from the Knesset: its open-data service and its website's
+own data service, through the window's fetch bridge. What they offer and how Local
+TV uses them is in [docs/knesset-data.md](docs/knesset-data.md).
 
 ## Sound
 
@@ -166,6 +199,7 @@ fullscreen.
 | `Shift`+`V` | Hide or show every meter |
 | `R` | Reload the selected channel |
 | `N` | Show or hide the news |
+| `K` | Open or close the Knesset view (in it: `F5` refreshes, `Esc` closes the details, then the view) |
 | `F5` | Refresh everything |
 | `C` | Channel manager |
 | `Esc` | Leave fullscreen, close panels, put back a channel you're dragging |
@@ -193,6 +227,7 @@ channel list as JSON. To ship a channel with the project, add it to
 | --- | --- |
 | `LocalTV.exe` | The app window (built from `host/`) |
 | `app/` | The dashboard: `index.html`, `styles.css`, `app.js`, `channels.js` (built-in channels), `news.js` (built-in news sources) |
+| `app/knesset.js`, `app/knesset-guide.js` | The Knesset view, and its Hebrew guide, glossary, bill stages and links |
 | `app/page-helper.js` | Runs inside web-page channels (sound, player-only view, meter) |
 | `host/src/` | C# source of the window |
 | `host/build.cmd` | Rebuilds `LocalTV.exe`; downloads the C# compiler and WebView2 SDK from nuget.org on first use |

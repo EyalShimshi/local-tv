@@ -31,11 +31,13 @@ Every request so far, in order, and where it stands on each platform.
 | R11 | Good on a vertical monitor; a zoom for tile size | ✅ | ✅ (tile size: 1, 2 or 3 per row on an upright phone) |
 | R12 | Slightly smaller so two tiles fit side by side | ✅ | ✅ (Medium, the default) |
 | R13 | Channels 14, 16, 10 and other worthwhile channels | ✅ | ✅ (+ i24NEWS, and off by default: i24NEWS English, Kan Educational, Makan 33, Channel 9) |
-| R14 | RSS news from popular outlets; collect many, activate the chosen ones | ✅ | ✅ (33 sources, 5 on) |
+| R14 | RSS news from popular outlets; collect many, activate the chosen ones | ✅ | ✅ (32 sources, 5 on) |
 | R15 | A button on every stream to spotlight it and solo its sound; another one switches | ✅ (center button, Enter) | ✅ (tap the tile) |
 | R16 | Drag tiles to rearrange | ✅ | ✅ (long-press and drag) |
 | R17 | Hide the green meter on any stream | ✅ | ✅ (per channel and all) |
 | R18 | A mobile app, the Shidur way, in a public repo with an installable APK release | – | ✅ this round ([docs/rounds/01-android-app.md](docs/rounds/01-android-app.md)) |
+| R19 | A section about the Knesset's day-to-day work (committees and everything else), thorough but easy to understand, from a deep scan of the Knesset's website | ✅ the Knesset view, in Hebrew ([docs/rounds/02-knesset-view.md](docs/rounds/02-knesset-view.md), [docs/knesset-data.md](docs/knesset-data.md)) | – (a next option) |
+| R20 | Never contact one news site again, no network events at all; leave no traces | ✅ (removed; blocked in the page, the fetch bridge, redirects, the browser engine and links) | ✅ (removed; blocked in the fetch layer, sources, channels, headline links and the web-page channel) |
 
 ## 3. Decision log
 
@@ -63,6 +65,9 @@ revisited.
 | D-17 | Smoke-test screenshots are attached to pre-releases | The owner (and the agent) can see each build's UI without a device |
 | D-18 | Version 1.0.0 for the first Android release; development builds are 1.0-dev.N | Feature parity with the desktop app |
 | D-19 | The emulator in CI draws with Lavapipe (`-gpu lavapipe`, the emulator's current software renderer), and the test plays a 512×288 stream | With the deprecated SwiftShader modes the whole emulated phone froze, then the emulator quit, seconds after the test stream started next to the live channels (builds 2–5; the phone's log shows the app running normally until everything stopped). An experiment across eight setups ([run 1](https://github.com/EyalShimshi/local-tv/actions/runs/44158250899), [repeat](https://github.com/EyalShimshi/local-tv/actions/runs/44160119649)): on Android 14, `swiftshader_indirect`, `swiftshader` and `software` froze; `lavapipe` and `swangle` passed 4 of 4. An emulator problem, not the app's |
+| D-20 | The Knesset view is a full-window view in Hebrew (right-to-left) that covers the channels while they keep playing | The owner's choice (round 2): the Knesset's data is in Hebrew, and the view needs the whole window |
+| D-21 | The Knesset view reads the Knesset's open data (OData v4) and its website's own data service, never the website's pages | Both answer plain requests; the pages sit behind a bot check that holds automated visitors (seen during the scan), so the view only links to them |
+| D-22 | Blocked sites are a list in code (`BLOCKED_DOMAINS` in `app/app.js` and `data/Text.kt`, `BlockedDomains` in `host/src/MainForm.cs`), enforced at every layer; docs don't repeat the names | The owner asked that one site never be contacted; one layer missing (a redirect, a frame, a link) would break that |
 
 ## 4. Architecture (Android)
 

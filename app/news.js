@@ -25,7 +25,6 @@ window.LOCALTV_NEWS = [
   { id: 'walla', name: 'וואלה! חדשות', lang: 'he', color: '#ff8a3d', url: 'https://rss.walla.co.il/feed/1' },
   { id: 'globes', name: 'גלובס', lang: 'he', color: '#34d399', url: 'https://www.globes.co.il/webservice/rss/rssfeeder.asmx/FeederNode?iID=2' },
   { id: 'inn-flash', name: 'ערוץ 7 · מבזקים', lang: 'he', color: '#fb923c', url: 'https://www.inn.co.il/Rss.aspx' },
-  { id: 'srugim', name: 'סרוגים', lang: 'he', color: '#c084fc', url: 'https://www.srugim.co.il/feed' },
   { id: 'kikar', name: 'כיכר השבת', lang: 'he', color: '#facc15', url: 'https://www.kikar.co.il/feed' },
   { id: 'bhol', name: 'בחדרי חרדים', lang: 'he', color: '#94a3b8', url: 'https://www.bhol.co.il/rss' },
   { id: 'rotter', name: 'רוטר · סקופים', lang: 'he', color: '#e879f9', url: 'https://rotter.net/rss/rotternews.xml' },

@@ -12,6 +12,8 @@ How the project is built, released, signed and kept working. For what the apps d
 | `android/app/src/main/assets/news.json` | Built-in news sources for Android |
 | `android/app/src/main/assets/page-helper.js` | Runs inside web-page channels (Channel 12) on Android |
 | `app/` | The Windows app's dashboard (HTML/JS); `app/channels.js` and `app/news.js` are its built-in lists |
+| `app/knesset.js`, `app/knesset-guide.js` | The Windows app's Knesset view, and its Hebrew guide, glossary, bill stages and links |
+| `docs/knesset-data.md` | The Knesset's website and data services, as the Knesset view uses them: endpoints, codes, quirks. Start here when the Knesset changes something |
 | `host/` | The Windows app's window (C#, WebView2); `host\build.cmd` builds `LocalTV.exe` |
 | `.github/workflows/build.yml` | CI: builds, tests and publishes both apps |
 | `.github/scripts/smoke-test.sh` | Runs the Android release APK on an emulator before anything is published |

@@ -28,6 +28,15 @@ fun resolveUrl(base: String, reference: String): String? = runCatching {
 /** The host of [url] ("www.knesset.tv"), or "" when it has none. */
 fun hostName(url: String): String = runCatching { URI(url.trim()).host }.getOrNull().orEmpty()
 
+/** Sites Local TV never contacts, whatever a saved source or a redirect says. */
+val BLOCKED_DOMAINS = listOf("srugim.co.il")
+
+/** True when [url] is on a blocked site (or one of its subdomains). */
+fun isBlockedAddress(url: String): Boolean {
+    val host = hostName(url).lowercase(Locale.ROOT).trimEnd('.')
+    return BLOCKED_DOMAINS.any { host == it || host.endsWith(".$it") }
+}
+
 /**
  * The first value of query parameter [name] in [url], decoded like a browser's URLSearchParams
  * does. A parameter that holds another address (?src=https://…/a.m3u8) keeps everything up to the

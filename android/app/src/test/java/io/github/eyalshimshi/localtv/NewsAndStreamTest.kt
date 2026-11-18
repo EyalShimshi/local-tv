@@ -1,10 +1,14 @@
 package io.github.eyalshimshi.localtv
 
+import io.github.eyalshimshi.localtv.data.BLOCKED_DOMAINS
+import io.github.eyalshimshi.localtv.data.Http
 import io.github.eyalshimshi.localtv.data.NewsCatalog
 import io.github.eyalshimshi.localtv.data.StreamCheck
+import io.github.eyalshimshi.localtv.data.isBlockedAddress
 import io.github.eyalshimshi.localtv.model.Headline
 import io.github.eyalshimshi.localtv.model.NewsSource
 import io.github.eyalshimshi.localtv.model.StoredHeadline
+import java.io.IOException
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
@@ -31,6 +35,17 @@ class NewsAndStreamTest {
     }
 
     private fun headline(key: String, time: Long?) = Headline(key, "Title $key", "https://example.com/$key", time, "")
+
+    @Test
+    fun blockedSitesAreNeverUsed() {
+        val domain = BLOCKED_DOMAINS.first()
+        assertTrue(isBlockedAddress("https://www.$domain/feed"))
+        assertTrue(isBlockedAddress("http://${domain.uppercase()}./x"))
+        assertEquals(false, isBlockedAddress("https://not$domain/feed"))
+        assertNull("a saved blocked source is dropped", NewsCatalog.normalize(source("x", url = "https://www.$domain/feed")))
+        val error = runCatching { Http { "test" }.fetchText("https://www.$domain/feed") }.exceptionOrNull()
+        assertTrue("blocked before any connection", error is IOException && error.message!!.contains("blocked"))
+    }
 
     @Test
     fun headlinesStayForAWhileAfterLeavingTheFeed() {

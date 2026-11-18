@@ -6,6 +6,8 @@ import android.graphics.Color
 import android.webkit.CookieManager
 import android.webkit.PermissionRequest
 import android.webkit.WebChromeClient
+import android.webkit.WebResourceRequest
+import android.webkit.WebResourceResponse
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.compose.runtime.Composable
@@ -21,7 +23,9 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.webkit.WebViewCompat
 import androidx.webkit.WebViewFeature
+import io.github.eyalshimshi.localtv.data.isBlockedAddress
 import io.github.eyalshimshi.localtv.model.Channel
+import java.io.ByteArrayInputStream
 import java.util.Locale
 
 /**
@@ -95,6 +99,17 @@ private fun createPageWebView(context: Context, url: String, audio: PageAudio): 
         CookieManager.getInstance().setAcceptThirdPartyCookies(this, true)
         if (documentStart) WebViewCompat.addDocumentStartJavaScript(this, helper, setOf("*"))
         webViewClient = object : WebViewClient() {
+            // Blocked sites get no request at all, even when the page embeds them.
+            override fun shouldInterceptRequest(view: WebView, request: WebResourceRequest): WebResourceResponse? =
+                if (isBlockedAddress(request.url.toString())) {
+                    WebResourceResponse("text/plain", "utf-8", 403, "Blocked", emptyMap(), ByteArrayInputStream(ByteArray(0)))
+                } else {
+                    null
+                }
+
+            override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean =
+                isBlockedAddress(request.url.toString())
+
             override fun onPageFinished(view: WebView, url: String?) {
                 if (!documentStart) view.evaluateJavascript(helper, null)
                 view.evaluateJavascript(audio.script(), null)

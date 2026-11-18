@@ -21,7 +21,7 @@ object NewsCatalog {
     fun normalize(source: NewsSource): NewsSource? {
         val name = cleanText(source.name, 60)
         val url = cleanText(source.url, 2048)
-        if (name.isEmpty() || !isHttpUrl(url)) return null
+        if (name.isEmpty() || !isHttpUrl(url) || isBlockedAddress(url)) return null
         return source.copy(
             id = cleanText(source.id, 120).ifEmpty { makeId("news") },
             name = name,

@@ -132,7 +132,7 @@ class FeedParserTest {
               <link rel="alternate" type="application/rss+xml" title="RSS" href="/feed/">
             </head><body></body></html>
         """.trimIndent()
-        assertEquals("https://www.srugim.co.il/feed/", FeedParser.findFeedLink(html, "https://www.srugim.co.il/"))
+        assertEquals("https://news.example.com/feed/", FeedParser.findFeedLink(html, "https://news.example.com/"))
         assertNull(FeedParser.findFeedLink("<html><head></head></html>", "https://example.com/"))
     }
 }

@@ -80,9 +80,9 @@ until **Reset channels**.
 
 Headlines from the news sites you switch on, newest first, refreshed every few minutes while the
 tab is open; pull down to refresh. The chips show one source at a time. Tap a headline to read it
-in your browser. **News sources** (the RSS button) lists 33 built-in sources in Hebrew and
+in your browser. **News sources** (the RSS button) lists 32 built-in sources in Hebrew and
 English: ynet מבזקים, N12, מעריב מבזקים, הארץ and ישראל היום are on at first; also ynet ראשי,
-N12 צבא וביטחון and חדשות בעולם, מעריב, וואלה!, גלובס, ערוץ 7, סרוגים, כיכר השבת, בחדרי חרדים,
+N12 צבא וביטחון and חדשות בעולם, מעריב, וואלה!, גלובס, ערוץ 7, כיכר השבת, בחדרי חרדים,
 רוטר, The Jerusalem Post, Haaretz, Ynetnews, Globes, BBC, The Guardian, The New York Times, The
 Washington Post, CNBC, Sky News, Fox News, CBS News, NPR, Axios, France 24, DW and Euronews.
 **Add source** takes any RSS or Atom feed, or a news site's home page that names its feed. If a
@@ -105,7 +105,12 @@ default), wallpaper or accent colors, pure black, and the app's language (Hebrew
 
 A borderless window with its own title bar, a resizable multiview with Grid and Spotlight layouts,
 a News panel beside or below the channels, keyboard shortcuts for everything, and fullscreen inside
-the window. See [DESKTOP.md](DESKTOP.md).
+the window. **Knesset** (`K`) opens a full-window view, in Hebrew, of the Knesset's day-to-day
+work: what's on air and on the agenda today, every committee with its members and sessions, plenum
+sittings, every vote and how each MK voted, bills with their stage in plain words, all 120 MKs
+(who's in the building now), the government, and a guide with a glossary. Live sessions open in the
+grid and recordings play in place. See [DESKTOP.md](DESKTOP.md) and, for the Knesset's data,
+[docs/knesset-data.md](docs/knesset-data.md).
 
 ## Privacy
 
@@ -158,7 +163,7 @@ Icons (Apache-2.0).
 - **עוצמה עד 200%** עם מגביל, ומדי עוצמה ירוקים בכל משבצת (אפשר להסתיר).
 - **לחיצה ארוכה וגרירה** משנה את סדר המשבצות; גודל המשבצות: אחת, שתיים או שלוש בשורה.
 - **מסך מלא** עם מעבר בין ערוצים, ו**תמונה בתוך תמונה** כשיוצאים מהאפליקציה.
-- **חדשות:** 33 מקורות בעברית ובאנגלית (חמישה פעילים בהתחלה), סינון לפי מקור, משיכה לרענון,
+- **חדשות:** 32 מקורות בעברית ובאנגלית (חמישה פעילים בהתחלה), סינון לפי מקור, משיכה לרענון,
   והוספת כל פיד RSS או Atom.
 - **ניהול ערוצים:** הפעלה וכיבוי, שינוי סדר, הוספת ערוץ (כתובת m3u8, קוד הטמעה או קישור watch.knesset.tv), בדיקה ואיפוס.
 - ממשק בעברית ובאנגלית, ערכה כהה כברירת מחדל.

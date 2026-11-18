@@ -161,6 +161,14 @@
     }
   }
 
+  // Sites Local TV never contacts, whatever a saved source, a link or a redirect says.
+  const BLOCKED_DOMAINS = ['srugim.co.il'];
+
+  function isBlockedUrl(url) {
+    const host = hostName(String(url || '').trim()).toLowerCase().replace(/\.$/, '');
+    return BLOCKED_DOMAINS.some(domain => host === domain || host.endsWith(`.${domain}`));
+  }
+
   function bidi(text) {
     const element = document.createElement('bdi');
     element.textContent = text;
@@ -218,6 +226,7 @@
         listeners.set(type, [...(listeners.get(type) || []), listener]);
       },
       async fetchText(url) {
+        if (isBlockedUrl(url)) throw new Error('this site is blocked in Local TV');
         if (!webview) {
           const response = await fetch(url, { cache: 'no-store' });
           const text = decodeBody(await response.arrayBuffer(), response.headers.get('content-type'));
@@ -249,7 +258,7 @@
     if (!raw || typeof raw !== 'object') return null;
     const name = cleanText(raw.name, 80);
     const url = cleanText(raw.url, 2048);
-    if (!name || !isHttpUrl(url)) return null;
+    if (!name || !isHttpUrl(url) || isBlockedUrl(url)) return null;
     const kind = raw.kind === 'page' ? 'page' : 'stream';
     return {
       id: cleanText(raw.id, 240) || makeId(),
@@ -328,7 +337,7 @@
     if (!raw || typeof raw !== 'object') return null;
     const name = cleanText(raw.name, 60);
     const url = cleanText(raw.url, 2048);
-    if (!name || !isHttpUrl(url)) return null;
+    if (!name || !isHttpUrl(url) || isBlockedUrl(url)) return null;
     return {
       id: cleanText(raw.id, 120) || makeId('news'),
       name,
@@ -376,7 +385,8 @@
 
   function loadNews(saved) {
     const data = saved && typeof saved === 'object' ? saved : {};
-    const removed = Array.isArray(data.removed) ? data.removed.filter(id => typeof id === 'string') : [];
+    // Only built-in sources can be "removed"; ids that left the built-in list are forgotten.
+    const removed = Array.isArray(data.removed) ? data.removed.filter(id => typeof id === 'string' && BUILTIN_NEWS.some(source => source.id === id)) : [];
     return {
       open: data.open !== false,
       filter: typeof data.filter === 'string' ? data.filter : 'all',
@@ -412,6 +422,8 @@
     };
   }
 
+  // While a Knesset recording plays, the TV channels are silent (not saved).
+  let tvSilenced = false;
   const state = loadState();
   const tiles = new Map();
   let saveTimer = 0;
@@ -584,7 +596,7 @@
     const shown = shownChannels();
     const soloActive = shown.some(channel => channel.soloed);
     const anyMuted = shown.some(channel => channel.muted);
-    const masterGain = state.master.muted ? 0 : loudness(state.master.volume);
+    const masterGain = state.master.muted || tvSilenced ? 0 : loudness(state.master.volume);
 
     for (const tile of tiles.values()) {
       const { channel, ui, el } = tile;
@@ -2091,6 +2103,7 @@
   }
 
   function openManager(tab = 'channels') {
+    if (knesset && knesset.isOpen()) knesset.setOpen(false);
     setFullscreen(null);
     setManagerTab(tab);
     dom.manager.inert = false;
@@ -2390,6 +2403,7 @@
       const poster = fields.poster.value.trim();
       if (!name) return invalid(fields.name, 'Enter a channel name.');
       if (!isHttpUrl(url)) return invalid(fields.url, 'Enter an http:// or https:// address.');
+      if (isBlockedUrl(url)) return invalid(fields.url, 'This site is blocked in Local TV.');
       if (poster && !isHttpUrl(poster)) return invalid(fields.poster, 'Enter an http:// or https:// image address, or leave it empty.');
 
       const values = { name, description: fields.description.value.trim(), kind, url, poster, enabled: fields.enabled.checked };
@@ -2578,7 +2592,7 @@
     if (raw.link) {
       try {
         const url = new URL(raw.link, baseUrl);
-        if (url.protocol === 'https:' || url.protocol === 'http:') link = url.href;
+        if ((url.protocol === 'https:' || url.protocol === 'http:') && !isBlockedUrl(url.href)) link = url.href;
       } catch {
         link = '';
       }
@@ -3143,7 +3157,14 @@
   }
 
   function bindNews() {
-    dom.newsToggle.addEventListener('click', () => setNewsOpen(!state.news.open));
+    dom.newsToggle.addEventListener('click', () => {
+      if (knesset && knesset.isOpen()) {
+        knesset.setOpen(false);
+        setNewsOpen(true);
+      } else {
+        setNewsOpen(!state.news.open);
+      }
+    });
     $('#news-close').addEventListener('click', () => setNewsOpen(false));
     dom.newsRefresh.addEventListener('click', () => loadDueSources(true));
     $('#news-sources').addEventListener('click', () => openManager('news'));
@@ -3217,6 +3238,10 @@
         setFeedback(dom.sourceTestResult, 'Enter an http:// or https:// address first.', 'error');
         return;
       }
+      if (isBlockedUrl(address)) {
+        setFeedback(dom.sourceTestResult, 'This site is blocked in Local TV.', 'error');
+        return;
+      }
       const test = ++sourceTest;
       setFeedback(dom.sourceTestResult, 'Testing…', 'pending');
       const result = await inspectFeed(address);
@@ -3239,6 +3264,7 @@
       const url = dom.sourceUrl.value.trim();
       const name = dom.sourceName.value.trim();
       if (!isHttpUrl(url)) return invalid(dom.sourceUrl, 'Enter an http:// or https:// address.');
+      if (isBlockedUrl(url)) return invalid(dom.sourceUrl, 'This site is blocked in Local TV.');
       if (!name) return invalid(dom.sourceName, 'Enter a name, or press Test feed to use the feed\'s own.');
       const existing = editingSourceId ? findSource(editingSourceId) : null;
       const duplicate = existing ? null : state.news.sources.find(source => source.url === url);
@@ -3346,6 +3372,15 @@
   // Shared by the dashboard's own key presses and those passed on from web-page channels,
   // whose frames keep keyboard focus after a click. Returns whether the key was used.
   function handleShortcut({ code, shiftKey, target = null }) {
+    // The Knesset view covers the channels: only its own keys work while it's open.
+    if (knesset && knesset.isOpen()) {
+      if (document.querySelector('dialog[open]')) return false;
+      if (code === 'F5') knesset.refresh();
+      else if (code === 'Escape') knesset.escape();
+      else if (code === 'KeyK' && !isTextField(target)) knesset.setOpen(false);
+      else return false;
+      return true;
+    }
     if (code === 'F5') {
       if (!document.querySelector('dialog[open]')) refreshAll();
       return true;
@@ -3379,6 +3414,7 @@
       case 'KeyG': setLayout(state.layout === 'grid' ? 'spotlight' : 'grid'); return true;
       case 'KeyC': toggleManager(); return true;
       case 'KeyN': setNewsOpen(!state.news.open); return true;
+      case 'KeyK': if (!knesset) return false; knesset.setOpen(true); return true;
       case 'KeyV': if (shiftKey) toggleAllMeters(); else if (id) toggleMeter(id); return true;
       case 'Enter': case 'NumpadEnter': if (onTabbedControl || !id) return false; toggleFocus(id); return true;
       case 'Equal': case 'NumpadAdd': setZoom(state.zoom + 0.1); return true;
@@ -3492,6 +3528,50 @@
     }
     masterMeter.update(running ? analyserPeaks(audio.masterAnalysers) : null, now, elapsed);
     requestAnimationFrame(animateMeters);
+  }
+
+  /* ---------- Knesset view ---------- */
+
+  // Opens a Knesset stream from the Knesset view: it becomes the big channel, heard alone.
+  function watchKnessetChannel(id) {
+    const channel = findChannel(id);
+    if (!channel || !tiles.has(id)) {
+      showToast(channel ? ['Not on air right now: ', bidi(channel.name)] : 'This stream is not on air right now');
+      return;
+    }
+    if (focusedId() !== id) toggleFocus(id);
+    revealTile(id);
+  }
+
+  const knesset = typeof window.LocalTVKnesset === 'function' ? window.LocalTVKnesset({
+    fetchText: url => host.fetchText(url),
+    showToast: message => showToast(message),
+    knessetChannels: () => state.channels.filter(channel => channel.auto === 'knesset' && channel.kind === 'stream').map(channel => ({
+      id: channel.id,
+      name: channel.name,
+      url: channel.url,
+      now: channel.now || '',
+      main: channel.builtin === true,
+      live: isShown(channel) && tiles.has(channel.id),
+    })),
+    watchChannel: watchKnessetChannel,
+    silenceTv(on) {
+      tvSilenced = on;
+      applyAudio();
+    },
+    refreshChannels: () => runDiscovery(),
+    onToggle(open) {
+      const toggle = $('#toggle-knesset');
+      if (!toggle) return;
+      toggle.setAttribute('aria-pressed', String(open));
+      toggle.title = open ? 'Back to the channels (K)' : 'The Knesset today: sessions, committees, votes, laws and MKs (K)';
+    },
+  }) : null;
+
+  if (knesset) {
+    $('.workspace').append(knesset.element);
+    document.body.append(...knesset.dialogs);
+    $('#toggle-knesset')?.addEventListener('click', () => knesset.toggle());
   }
 
   /* ---------- Start ---------- */

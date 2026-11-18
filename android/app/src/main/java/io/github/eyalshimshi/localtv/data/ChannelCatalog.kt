@@ -17,7 +17,7 @@ object ChannelCatalog {
     fun normalize(channel: Channel): Channel? {
         val name = cleanText(channel.name, 80)
         val url = cleanText(channel.url, 2048)
-        if (name.isEmpty() || !isHttpUrl(url)) return null
+        if (name.isEmpty() || !isHttpUrl(url) || isBlockedAddress(url)) return null
         return channel.copy(
             id = cleanText(channel.id, 240).ifEmpty { makeId("ch") },
             name = name,

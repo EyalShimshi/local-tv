@@ -118,7 +118,7 @@ object FeedParser {
         val cleanTitle = plainText(title, 300)
         if (cleanTitle.isEmpty()) return null
         val absolute = if (link.isBlank()) null else resolveUrl(baseUrl, link)
-        val cleanLink = if (absolute != null && isHttpUrl(absolute)) absolute else ""
+        val cleanLink = if (absolute != null && isHttpUrl(absolute) && !isBlockedAddress(absolute)) absolute else ""
         return Headline(
             key = cleanText(guid, 500).ifEmpty { cleanLink }.ifEmpty { cleanTitle },
             title = cleanTitle,
